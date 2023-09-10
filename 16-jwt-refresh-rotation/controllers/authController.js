@@ -26,8 +26,8 @@ const handleLogin = async (req, res) => {
         const refreshTokenPayload = { "username": user.username };
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
         const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-        const accessTokenExpiration = { expiresIn: "30s" };
-        const refreshTokenExpiration = { expiresIn: "1d" };
+        const accessTokenExpiration = { expiresIn: "10s" };
+        const refreshTokenExpiration = { expiresIn: "15s" };
 
         const newAccessToken = jwt.sign(accessTokenPayload, accessTokenSecret, accessTokenExpiration);
         const newRefreshToken = jwt.sign(refreshTokenPayload, refreshTokenSecret, refreshTokenExpiration);

@@ -52,10 +52,10 @@ const handleRefreshToken = async (req, res) => {
             }
         };
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-        const accessTokenExpiration = { "expiresIn": "30s" };
+        const accessTokenExpiration = { "expiresIn": "10s" };
         const refreshTokenPayload = { "username": user.username };
         const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-        const refreshTokenExpiration = { "expiresIn": "1d" };
+        const refreshTokenExpiration = { "expiresIn": "15s" };
 
         const accessToken = jwt.sign(accessTokenPayload, accessTokenSecret, accessTokenExpiration);
         const newRefreshToken = jwt.sign(refreshTokenPayload, refreshTokenSecret, refreshTokenExpiration);
