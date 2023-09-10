@@ -25,8 +25,10 @@ const handleLogin = async (req, res) => {
         const refreshTokenPayload = { "username": user.username };
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
         const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-        const accessTokenExpiration = { expiresIn: "30s" };
-        const refreshTokenExpiration = { expiresIn: "1d" };
+        // const accessTokenExpiration = { expiresIn: "30s" };
+        // const refreshTokenExpiration = { expiresIn: "1d" };
+        const accessTokenExpiration = { expiresIn: "10s" };
+        const refreshTokenExpiration = { expiresIn: "15s" };
 
         const accessToken = jwt.sign(accessTokenPayload, accessTokenSecret, accessTokenExpiration);
         const refreshToken = jwt.sign(refreshTokenPayload, refreshTokenSecret, refreshTokenExpiration);
@@ -39,10 +41,10 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", refreshToken, {
             httpOnly: true,
             sameSite: "None",
-            // secure: true, // needed in production, comment out for thunder api test
+            secure: true, // needed in production, comment out for thunder api test
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({ accessToken });
+        res.json({ roles, accessToken });
     } else {
         res.sendStatus(401);
     }

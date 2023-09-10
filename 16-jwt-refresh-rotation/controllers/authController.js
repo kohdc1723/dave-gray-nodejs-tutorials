@@ -15,7 +15,7 @@ const handleLogin = async (req, res) => {
     // evaluate password
     const match = await bcrypt.compare(password, user.password);
     if (match) {
-        const roles = Object.values(user.roles);
+        const roles = Object.values(user.roles).filter(Boolean);
         // if use jwt token, create jwt here
         const accessTokenPayload = {
             "userinfo": {
@@ -32,17 +32,20 @@ const handleLogin = async (req, res) => {
         const newAccessToken = jwt.sign(accessTokenPayload, accessTokenSecret, accessTokenExpiration);
         const newRefreshToken = jwt.sign(refreshTokenPayload, refreshTokenSecret, refreshTokenExpiration);
 
-        const newRefreshTokenArray = !cookies?.jwt
+        let newRefreshTokenArray = !cookies?.jwt
             ? user.refreshToken
             : user.refreshToken.filter(rt => rt !== cookies.jwt);
         
         if (cookies?.jwt) {
-            res.clearCookie("jwt", {
-                httpOnly: true,
-                sameSite: "None",
-                secure: true,
-                maxAge: 24 * 60 * 60 * 1000
-            });
+            const refreshToken = cookies.jwt;
+            const foundToken = await User.findOne({ refreshToken }).exec();
+
+            if (!foundToken) {
+                console.log("attempted refresh token reuse at login");
+                newRefreshTokenArray = [];
+            }
+
+            res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
         }
 
         // saving refresh token in the db with current user
@@ -54,10 +57,10 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", newRefreshToken, {
             httpOnly: true,
             sameSite: "None",
-            // secure: true, // needed in production, comment out for thunder api test
+            secure: true, // needed in production, comment out for thunder api test
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({ newAccessToken });
+        res.json({ accessToken: newAccessToken });
     } else {
         res.sendStatus(401);
     }

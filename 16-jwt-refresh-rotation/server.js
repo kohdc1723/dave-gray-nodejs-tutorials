@@ -36,6 +36,7 @@ app.use("/logout", require("./routes/logout"));
 
 app.use(verifyToken); // all the routes after this line require jwt auth (works like a waterfall)
 app.use("/employees", require("./routes/api/employees"));
+app.use('/users', require('./routes/api/users'));
 app.all("*", (req, res) => {
     res.status(404);
 
